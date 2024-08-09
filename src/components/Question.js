@@ -1,12 +1,42 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 function Question({ question, onAnswered }) {
   const [timeRemaining, setTimeRemaining] = useState(10);
 
-  // add useEffect code
+  useEffect(() => {
+    // Define the function that will be called after 1 second
+    const countdown = () => {
+      setTimeRemaining((prevTime) => {
+        if (prevTime <= 1) {
+         
+          onAnswered(false); 
+          return 10; 
+        }
+        return prevTime - 1; // Decrease time by 1 second
+      });
+    };
+
+    // Set up a timeout to call the countdown function every second
+    const timerId = setTimeout(() => {
+      countdown(); // Initial call
+      const intervalId = setInterval(countdown, 1000); // Subsequent calls
+
+      // Cleanup function to clear both timeout and interval
+      return () => {
+        clearTimeout(timerId);
+        clearInterval(intervalId);
+      };
+    }, 1000);
+
+    // Cleanup function for useEffect
+    return () => {
+      clearTimeout(timerId);
+      clearInterval(timerId);
+    };
+  }, [onAnswered]);
 
   function handleAnswer(isCorrect) {
-    setTimeRemaining(10);
+    setTimeRemaining(10); 
     onAnswered(isCorrect);
   }
 
